@@ -71,10 +71,7 @@ def crearJson():
 def dameInscriptePorHash(inscriptes, hash):
     for inscripte in inscriptes:
         if inscripte[KEY_HASH] == hash:
-            return "{name} {sname} ({mail})".format(
-                name=inscripte[KEY_NOMBRE],
-                sname=inscripte[KEY_APELLIDO],
-                mail=inscripte[KEY_EMAIL])
+            return inscripte
     return None
 
 def mandarMails(inscriptes):
