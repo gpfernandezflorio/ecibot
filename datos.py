@@ -23,6 +23,15 @@ El código es único por persona. No lo comparta con nadie.
 Saludos,
 equipo organizador de la ECI 2021"""
 
+# Mensaje enviado cuando se registra correctamente une usuarie
+msgUsuarieRegistrade = "Le usuarie {user} se registró correctamente con el hash de {real}."
+# Mensaje enviado cuando el hash es correcto pero falla al quitarle el rol
+msgErrorAlQuitarPermisos = "Le usuarie {user} envió un hash correcto pero no le puedo sacar el rol."
+# Mensaje enviado cuando se recibe un hash inválido
+msgHashInvalido = "{user}: el hash que mandaste no es válido."
+# Tiempo (en segundos) que tarda en eliminarse un mensaje de "hash inválido"
+timeoutMensajeHashInvalido = 5
+
 ## Otros
 PORT = 465  # For SSL
 ARCHIVO_JSON = 'x.json'
