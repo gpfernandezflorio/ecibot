@@ -48,25 +48,41 @@ async def recibir_mensaje_discord(message):
         await message.delete(delay=timeoutMensajeHashInvalido)
     else:
         await message.delete(delay=0.1)
-        respuesta = procesar_mensaje(message.content)
+        respuesta, miHash = procesar_mensaje(message.content)
         if respuesta is None:
             await message.channel.send(msgHashInvalido.format(user=message.author.name))
         else:
             nuevo_nombre = "{name} {sname}".format(
                 name=respuesta[KEY_NOMBRE],
                 sname=respuesta[KEY_APELLIDO])
-            await canalAdmin.send(msgUsuarieRegistrade.format(user=message.author.name,real="{name} ({mail})".format(
-                name=nuevo_nombre,
-                mail=respuesta[KEY_EMAIL])))
-            try:
-                await message.author.edit(nick=nuevo_nombre)
-            except:
-                await canalAdmin.send(msgErrorAlCambiarNombre.format(user=message.author.name))
-            try:
-                await message.author.remove_roles(servidorActivo.get_role(id_rol))
-            except:
-                await canalAdmin.send(msgErrorAlQuitarRol.format(user=message.author.name))
-
+            anterior = hashUsado(miHash)
+            if (anterior is None):
+                marcarRegistro(miHash, respuesta, message.author.id)
+                await canalAdmin.send(msgUsuarieRegistrade.format(user=message.author.name,real="{name} ({mail})".format(
+                    name=nuevo_nombre,
+                    mail=respuesta[KEY_EMAIL])))
+                try:
+                    await message.author.edit(nick=nuevo_nombre)
+                except:
+                    await canalAdmin.send(msgErrorAlCambiarNombre.format(user=message.author.name))
+                try:
+                    await message.author.remove_roles(servidorActivo.get_role(id_rol))
+                except:
+                    await canalAdmin.send(msgErrorAlQuitarRol.format(user=message.author.name))
+            else:
+                idAnterior = anterior['userID']
+                idActual = message.author.id
+                inscripteAnterior = anterior['inscripte']
+                inscripteActual = respuesta
+                momentoAnterior = anterior['timestamp']
+                await message.channel.send(msgHashInvalido.format(user=message.author.name))
+                await canalAdmin.send(msgErrorRepetido.format(
+                    user=message.author.name,
+                    idActual=idActual, idAnterior=idAnterior,
+                    realAnterior=nuevo_nombre, realActual = "{name} {sname}".format(
+                        name=inscripteAnterior[KEY_NOMBRE],
+                        sname=inscripteAnterior[KEY_APELLIDO]),
+                    time=momentoAnterior, hash=miHash))
 
 def conectar_debug():
     inicializar()
@@ -82,5 +98,9 @@ def debug_chat():
             print(respuesta)
 
 def procesar_mensaje(txt):
-    hash = txt
-    return dameInscriptePorHash(inscriptes['inscriptes'], hash)
+    i = txt.find('<||')
+    j = txt.find('||>')
+    if (i < 0 or j < 0):
+        return None, ''
+    miHash = txt[i+3:j]
+    return dameInscriptePorHash(inscriptes['inscriptes'], miHash), miHash
