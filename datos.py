@@ -40,6 +40,8 @@ Los organizadores de la ECI 2021""".replace("{link}", LINK_SERVIDOR)
 
 # Mensaje enviado cuando se registra correctamente une usuarie
 msgUsuarieRegistrade = ":white_check_mark: Le usuarie **{user}** se registró correctamente con el hash de **{real}**."
+# Mensaje enviado cuando se registra correctamente une usuarie que ya se había registrado antes
+msgUsuarieRegistrade2 = ":repeat: Le usuarie **{user}** volvió a ingresar el hash de **{real}** pero como está usando el mismo id le dejé entrar."
 # Mensaje enviado cuando el hash es correcto pero falla al cambiarle el nombre
 msgErrorAlCambiarNombre = ":warning: Le usuarie **{user}** envió un hash correcto pero no le puedo cambiar el nombre."
 # Mensaje enviado cuando el hash es correcto pero falla al quitarle el rol
@@ -48,9 +50,9 @@ msgErrorAlQuitarRol = ":warning: Le usuarie **{user}** envió un hash correcto p
 msgHashInvalido = "{user}: el código que mandaste no es válido."
 # Mensaje enviado cuando se recibe un hash repetido
 msgErrorRepetido = ":exclamation: Le usuarie **{user}** envió un hash ({hash}) que ya se había usando antes ({time}):\n" + \
-    "Id anterior: {idAnterior} ; id actual: {idActual}\nInscripte anterior: {realAnterior} ; inscripte actual {realActual}."
+    "Id anterior: {idAnterior} ; id actual: {idActual}\nInscripte anterior: **{realAnterior}** ; inscripte actual **{realActual}**."
 # Tiempo (en segundos) que tarda en eliminarse un mensaje de "hash inválido"
-timeoutMensajeHashInvalido = 5
+timeoutMensajeHashInvalido = 10
 
 ## Otros
 NOMBRE_SMTP = "smtp.dc.uba.ar" # "smtp.gmail.com"

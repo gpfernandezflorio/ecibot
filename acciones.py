@@ -57,32 +57,39 @@ async def recibir_mensaje_discord(message):
                 sname=respuesta[KEY_APELLIDO])
             anterior = hashUsado(miHash)
             if (anterior is None):
-                marcarRegistro(miHash, respuesta, message.author.id)
-                await canalAdmin.send(msgUsuarieRegistrade.format(user=message.author.name,real="{name} ({mail})".format(
-                    name=nuevo_nombre,
-                    mail=respuesta[KEY_EMAIL])))
-                try:
-                    await message.author.edit(nick=nuevo_nombre)
-                except:
-                    await canalAdmin.send(msgErrorAlCambiarNombre.format(user=message.author.name))
-                try:
-                    await message.author.remove_roles(servidorActivo.get_role(id_rol))
-                except:
-                    await canalAdmin.send(msgErrorAlQuitarRol.format(user=message.author.name))
+                await registrar(nuevo_nombre, miHash, respuesta, message, False)
             else:
                 idAnterior = anterior['userID']
                 idActual = message.author.id
-                inscripteAnterior = anterior['inscripte']
-                inscripteActual = respuesta
-                momentoAnterior = anterior['timestamp']
-                await message.channel.send(msgHashInvalido.format(user=message.author.name))
-                await canalAdmin.send(msgErrorRepetido.format(
-                    user=message.author.name,
-                    idActual=idActual, idAnterior=idAnterior,
-                    realAnterior=nuevo_nombre, realActual = "{name} {sname}".format(
-                        name=inscripteAnterior[KEY_NOMBRE],
-                        sname=inscripteAnterior[KEY_APELLIDO]),
-                    time=momentoAnterior, hash=miHash))
+                if (idAnterior == idActual):
+                    await registrar(nuevo_nombre, miHash, respuesta, message, True)
+                else:
+                    await message.channel.send(msgHashInvalido.format(user=message.author.name))
+                    inscripteAnterior = anterior['inscripte']
+                    inscripteActual = respuesta
+                    momentoAnterior = anterior['timestamp']
+                    await canalAdmin.send(msgErrorRepetido.format(
+                        user=message.author.name,
+                        idActual=idActual, idAnterior=idAnterior,
+                        realAnterior=nuevo_nombre, realActual = "{name} {sname}".format(
+                            name=inscripteAnterior[KEY_NOMBRE],
+                            sname=inscripteAnterior[KEY_APELLIDO]),
+                        time=momentoAnterior, hash=miHash))
+
+async def registrar(nuevo_nombre, miHash, respuesta, message, repetido):
+    marcarRegistro(miHash, respuesta, message.author.id)
+    await canalAdmin.send((msgUsuarieRegistrade2 if repetido else msgUsuarieRegistrade)
+        .format(user=message.author.name,real="{name} ({mail})".format(
+            name=nuevo_nombre,
+            mail=respuesta[KEY_EMAIL])))
+    try:
+        await message.author.edit(nick=nuevo_nombre)
+    except:
+        await canalAdmin.send(msgErrorAlCambiarNombre.format(user=message.author.name))
+    try:
+        await message.author.remove_roles(servidorActivo.get_role(id_rol))
+    except:
+        await canalAdmin.send(msgErrorAlQuitarRol.format(user=message.author.name))
 
 def conectar_debug():
     inicializar()
@@ -98,9 +105,11 @@ def debug_chat():
             print(respuesta)
 
 def procesar_mensaje(txt):
-    i = txt.find('<||')
-    j = txt.find('||>')
-    if (i < 0 or j < 0):
-        return None, ''
-    miHash = txt[i+3:j]
+    miHash = txt
+    i = miHash.find('<||')
+    j = miHash.find('||>')
+    if (j > 0 and j > i+3):
+        miHash = miHash[:j]
+    if (i >= 0):
+        miHash = miHash[i+3:]
     return dameInscriptePorHash(inscriptes['inscriptes'], miHash), miHash
