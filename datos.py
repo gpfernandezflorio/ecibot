@@ -10,20 +10,33 @@ KEY_EMAIL       = "EMAIL"
 ORDEN_ESPERADO = [KEY_EMAIL, KEY_NOMBRE, KEY_APELLIDO]
 
 ## Cuenta emisora de mails
-CUENTA = 'clemen.dc.uba'
+CUENTA = 'eci2021-bot@dc.uba.ar'
+## Link al servidor
+LINK_SERVIDOR = "MJbmsCwXy8"
 ## Información del mail (se reemplazarán "{nombre}" por el nombre y apellido del destinatario y "{hash}" por su hash asignado)
 ASUNTO = "Acceso al servidor de la ECI 2021"
 MENSAJE = """\
-Estimado/a {nombre}, mediante el siguiente enlace podrá acceder al servidor de Discord de la ECI 2021.
-LINK
+Hola {nombre},
 
-Al ingresar, tendrá acceso al canal mesa-de-entrada donde deberá enviar el siguiente código de registro:
+Leé atentamente estas instrucciones antes de hacer nada, ya que hay varios pasos para acceder y validar tu cuenta en el servidor de Discord de la ECI 2021.
+
+Si no tenés una cuenta de Discord, create una desde acá: https://discord.com/register
+
+Después logueate desde la app, o desde acá: https://discord.com/login
+
+Al ingresar, vas a tener a la izquierda varios íconos, y uno con un signo "+" grande. Hacele click, y en la ventanita que aparece, apretá en el mensaje que aparece abajo que dice "Únete a un servidor". Ahí colocá la clave de invitación al servidor de la ECI que es esta:
+{link}
+
+Al ingresar al servidor de la ECI, vas a tener acceso sólo al canal #mesa-de-entrada, donde tenés que enviar el siguiente código de validación:
 <<||{hash}||>>
+(copiá la línea completa, incluyendo los <<|| y ||>>)
 
-El código es único por persona. No lo comparta con nadie.
+Eso te va a validar automáticamente y te va a dejar entrar al Discord. El código es único por persona. ¡No lo compartas con nadie!
+
+Por favor, no respondas a este mensaje. Yo soy sólo un bot. Si tenés problemas para ingresar, enviá un mail a eci2021@dc.uba.ar (y armate de mucha paciencia, somos muchos).
 
 Saludos,
-equipo organizador de la ECI 2021"""
+Los organizadores de la ECI 2021""".replace("{link}", LINK_SERVIDOR)
 
 # Mensaje enviado cuando se registra correctamente une usuarie
 msgUsuarieRegistrade = ":white_check_mark: Le usuarie **{user}** se registró correctamente con el hash de **{real}**."
@@ -40,5 +53,6 @@ msgErrorRepetido = ":exclamation: Le usuarie **{user}** envió un hash ({hash}) 
 timeoutMensajeHashInvalido = 5
 
 ## Otros
-PORT = 465  # For SSL
+NOMBRE_SMTP = "smtp.dc.uba.ar" # "smtp.gmail.com"
+PORT = 587 # 465
 ARCHIVO_JSON = 'x.json'

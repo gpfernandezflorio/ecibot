@@ -98,14 +98,17 @@ def dameInscriptePorHash(inscriptes, miHash):
     return None
 
 def mandarMails(inscriptes):
-    sender = CUENTA+"@gmail.com"
+    sender = CUENTA
     password = input("Ingresar contraseña para {sender}: ".format(sender=sender))
 
     # Create a secure SSL context
     context = ssl.create_default_context()
 
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", PORT, context=context) as server:
+        with smtplib.SMTP(NOMBRE_SMTP, PORT) as server:
+            server.ehlo()  # Can be omitted
+            server.starttls(context=context)
+            server.ehlo()  # Can be omitted
             server.login(sender, password)
             for miHash in inscriptes.keys():
                 inscripte = dameInscriptePorHash(inscriptes, miHash)
@@ -123,8 +126,10 @@ def mandarMails(inscriptes):
                 message["To"] = email
                 contenido = MENSAJE.format(nombre=nombre, hash=miHash)
                 message.attach(MIMEText(contenido, "plain"))
-                #print(message)
-                #print(contenido)
+                print(message)
+                print("XXX")
+                print(contenido)
+                print("---")
                 #server.sendmail(sender, email, message.as_string())
     except smtplib.SMTPAuthenticationError:
         print("Contraseña incorrecta")
