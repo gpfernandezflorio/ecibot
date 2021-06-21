@@ -48,6 +48,8 @@ msgErrorAlCambiarNombre = ":warning: Le usuarie **{user}** envió un hash correc
 msgErrorAlQuitarRol = ":warning: Le usuarie **{user}** envió un hash correcto pero no le puedo sacar el rol."
 # Mensaje enviado cuando se recibe un hash inválido
 msgHashInvalido = "{user}: el código que mandaste no es válido."
+# Mensaje enviado cuando se reciben muchos mensajes juntos
+msgBanPorFlood = "{user}: esperá un minuto antes de volver a mandar un código."
 # Mensaje enviado cuando se recibe un hash repetido
 msgErrorRepetido = ":exclamation: Le usuarie **{user}** envió un hash ({hash}) que ya se había usando antes ({time}):\n" + \
     "Id anterior: {idAnterior} ; id actual: {idActual}\nInscripte anterior: **{realAnterior}** ; inscripte actual **{realActual}**."

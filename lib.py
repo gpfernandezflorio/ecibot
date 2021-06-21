@@ -194,3 +194,19 @@ def cargarDropboxFS():
     return dic
 
 dropboxFS = cargarDropboxFS()
+flood = {}
+
+def antiflood(id):
+    ahora = datetime.now()
+    if (id in flood):
+        anterior = flood[id]
+        ts = anterior['ts']
+        delta = (ahora-ts).total_seconds()
+        anterior['ts'] = ahora
+        if delta < 60:
+            anterior['k']+= 1
+        else:
+            anterior['k'] = 1
+        return anterior['k']
+    flood[id] = {'k':1, 'ts': ahora}
+    return 0

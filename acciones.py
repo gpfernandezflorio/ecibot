@@ -48,6 +48,11 @@ async def recibir_mensaje_discord(message):
         await message.delete(delay=timeoutMensajeHashInvalido)
     else:
         await message.delete(delay=0.1)
+        flood = antiflood(message.author.id)
+        if (flood > 1):
+            if (flood == 2):
+                await message.channel.send(msgBanPorFlood.format(user=message.author.name))
+            return
         respuesta, miHash = procesar_mensaje(message.content)
         if respuesta is None:
             await message.channel.send(msgHashInvalido.format(user=message.author.name))
