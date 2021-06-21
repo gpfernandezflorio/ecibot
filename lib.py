@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import json
 import dropbox
 import smtplib, ssl
+from threading import Thread
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -162,13 +163,15 @@ def hashUsado(miHash):
     #     return None
 
 def marcarRegistro(miHash, inscripte, userID):
-    guardarArchivo('{hash}.json'.format(hash=miHash),
-        json.dumps(
-            {"timestamp":str(datetime.now()),
-            #"inscripte":inscripte,
-            "userID":userID
-            })
-    )
+    info = {
+        "timestamp":str(datetime.now()),
+        #"inscripte":inscripte,
+        "userID":userID
+    }
+    dropboxFS[miHash] = info
+    process = Thread(target=guardarArchivo, args=['{hash}.json'.format(hash=miHash), json.dumps(info)])
+    process.start()
+    #guardarArchivo('{hash}.json'.format(hash=miHash), json.dumps(info))
 
 def guardarArchivo(ruta, contenido):
     jsonfile = open(ruta, 'w')
