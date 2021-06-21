@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 import json
+import dropbox
 import smtplib, ssl
 from datetime import datetime
 from email.mime.text import MIMEText
@@ -23,6 +24,8 @@ id_canal_admin = int(os.getenv('DISCORD_'+servidor+'_CH_ADMIN'))
 print("ID CANAL ADMIN: " + str(id_canal_admin))
 id_rol = int(os.getenv('DISCORD_'+servidor+'_ROLE'))
 print("ID ROL: " + str(id_rol))
+dropbox_token = os.getenv('DROPBOX_TOKEN')
+dbx = dropbox.Dropbox(dropbox_token)
 
 def cargarInscriptes():
     if not os.path.isfile(ARCHIVO_JSON):
@@ -142,25 +145,49 @@ def purgarEspacios(txt):
     return txt
 
 def hashUsado(miHash):
-    if not os.path.isdir('log'):
-        os.mkdir('log')
-    if not os.path.isdir('log'):
-        print("Error: no se pudo crear la carpeta 'log'")
-        exit(0)
-    nombreCompleto = os.path.join('log', '{hash}.json'.format(hash=miHash))
-    if os.path.isfile(nombreCompleto):
-        jsonfile = open(nombreCompleto, 'r')
-        resultado = json.loads(jsonfile.read())
-        jsonfile.close()
-        return resultado
-    else:
-        return None
+    return dropboxFS.get(miHash, None)
+    # nombreCompleto = '{hash}.json'.format(hash=miHash)
+    # return leerArchivo(nombreCompleto)
+    # if not os.path.isdir('log'):
+    #     os.mkdir('log')
+    # if not os.path.isdir('log'):
+    #     print("Error: no se pudo crear la carpeta 'log'")
+    #     exit(0)
+    # if os.path.isfile(nombreCompleto):
+    #     jsonfile = open(nombreCompleto, 'r')
+    #     resultado = json.loads(jsonfile.read())
+    #     jsonfile.close()
+    #     return resultado
+    # else:
+    #     return None
 
 def marcarRegistro(miHash, inscripte, userID):
-    jsonfile = open(os.path.join('log', '{hash}.json'.format(hash=miHash)), 'w')
-    jsonfile.write(json.dumps(
-        {"timestamp":str(datetime.now()),
-        "userID":userID,
-        "inscripte":inscripte}
-    ))
+    guardarArchivo('{hash}.json'.format(hash=miHash),
+        json.dumps(
+            {"timestamp":str(datetime.now()),
+            #"inscripte":inscripte,
+            "userID":userID
+            })
+    )
+
+def guardarArchivo(ruta, contenido):
+    jsonfile = open(ruta, 'w')
+    jsonfile.write(contenido)
     jsonfile.close()
+    with open(ruta, 'rb') as f:
+        dbx.files_upload(f.read(), "/ECIbot/"+ruta, mute=True, mode=dropbox.files.WriteMode.overwrite)
+
+def leerArchivo(ruta):
+    try:
+        f, r = dbx.files_download("/ECIbot/"+ruta)
+        return json.loads(r.content)
+    except dropbox.exceptions.ApiError:
+        return None
+
+def cargarDropboxFS():
+    dic = {}
+    for entry in dbx.files_list_folder('/ECIbot/').entries:
+        dic[entry.name[:-5]] = leerArchivo(entry.name)
+    return dic
+
+dropboxFS = cargarDropboxFS()
